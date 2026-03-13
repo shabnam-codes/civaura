@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
@@ -7,21 +6,21 @@ import pickle
 import os
 
 # ═══════════════════════════════════════════════
-# PATHS
+# PATHS — relative to this file's location
 # ═══════════════════════════════════════════════
-EXCEL_PATH = '/content/drive/MyDrive/Hackathon/Data/CategoryCode_Mapping.xlsx'
-MODEL_PATH = '/content/drive/MyDrive/Hackathon/Data/resolution_model.pkl'
+BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR   = os.path.join(BASE_DIR, 'Data')
+EXCEL_PATH = os.path.join(DATA_DIR, 'CategoryCode_Mapping.xlsx')
+MODEL_PATH = os.path.join(DATA_DIR, 'resolution_model.pkl')
 
 # ═══════════════════════════════════════════════
 # STEP 1 — LOAD EXCEL SHEETS
 # ═══════════════════════════════════════════════
 print("⏳ Loading Excel sheets...")
-
 categories_df   = pd.read_excel(EXCEL_PATH, sheet_name='Complaint Category')
 input_fields_df = pd.read_excel(EXCEL_PATH, sheet_name='Input Fields')
 movement_df     = pd.read_excel(EXCEL_PATH, sheet_name='Movement Mapping')
 fixed_dest_df   = pd.read_excel(EXCEL_PATH, sheet_name='Fixed Destination')
-
 print(f"✅ Complaint Category : {len(categories_df)} rows")
 print(f"✅ Input Fields       : {len(input_fields_df)} rows")
 print(f"✅ Movement Mapping   : {len(movement_df)} rows")
@@ -31,24 +30,20 @@ print(f"✅ Fixed Destination  : {len(fixed_dest_df)} rows")
 # STEP 2 — CLEAN CATEGORIES
 # ═══════════════════════════════════════════════
 print("\n⏳ Cleaning category data...")
-
 categories_df = categories_df.dropna(subset=['Code', 'Description'])
 categories_df['Code'] = pd.to_numeric(categories_df['Code'], errors='coerce')
 categories_df = categories_df.dropna(subset=['Code'])
 categories_df['Code'] = categories_df['Code'].astype(int)
 categories_df['Description'] = categories_df['Description'].str.strip()
-
 print(f"✅ Clean categories   : {len(categories_df)} rows")
 
 # ═══════════════════════════════════════════════
 # STEP 3 — BUILD USEFUL LISTS
 # ═══════════════════════════════════════════════
 print("\n⏳ Building lookup lists...")
-
 category_list = categories_df[['Code', 'Description']].values.tolist()
 org_list      = categories_df['OrgCode'].dropna().unique().tolist()
 cats_encoded  = categories_df['Code'].astype(str).tolist()
-
 print(f"✅ Category list      : {len(category_list)} entries")
 print(f"✅ Org codes          : {len(org_list)} unique")
 
@@ -56,7 +51,6 @@ print(f"✅ Org codes          : {len(org_list)} unique")
 # STEP 4 — BUILD ROUTING DICTIONARY
 # ═══════════════════════════════════════════════
 print("\n⏳ Building routing dictionary...")
-
 routing_dict = {}
 for _, row in movement_df.iterrows():
     try:
@@ -79,7 +73,6 @@ print(f"✅ Fixed destinations : {len(fixed_dest_dict)} entries")
 # STEP 5 — RESOLUTION TIME MODEL
 # ═══════════════════════════════════════════════
 print("\n⏳ Setting up resolution time model...")
-
 le_cat = LabelEncoder()
 le_org = LabelEncoder()
 le_cat.fit(cats_encoded)
@@ -99,15 +92,12 @@ else:
     mock_cats = np.random.choice(cats_encoded, n)
     mock_orgs = np.random.choice(org_list, n)
     mock_days = np.random.randint(1, 30, n)
-
     X = np.column_stack([
         le_cat.transform(mock_cats),
         le_org.transform(mock_orgs)
     ])
-
     resolution_model = LinearRegression()
     resolution_model.fit(X, mock_days)
-
     with open(MODEL_PATH, 'wb') as f:
         pickle.dump({
             'model'  : resolution_model,
@@ -119,7 +109,6 @@ else:
 # ═══════════════════════════════════════════════
 # STEP 6 — HELPER FUNCTIONS
 # ═══════════════════════════════════════════════
-
 def get_resolution_days(category_code, org_code):
     try:
         cat_str = str(category_code)
@@ -136,7 +125,6 @@ def get_resolution_days(category_code, org_code):
         print(f"⚠️ Resolution fallback: {e}")
         return 7
 
-
 def get_routing(category_code, org_code):
     try:
         key  = (int(category_code), str(org_code))
@@ -148,7 +136,6 @@ def get_routing(category_code, org_code):
         print(f"⚠️ Routing fallback: {e}")
         return 'GENERAL_DEPT'
 
-
 def get_category_name(code):
     try:
         match = categories_df[categories_df['Code'] == int(code)]
@@ -157,7 +144,6 @@ def get_category_name(code):
         return 'Unknown Category'
     except:
         return 'Unknown Category'
-
 
 def get_required_fields(category_code):
     try:
