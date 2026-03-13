@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivAura — File a Grievance</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand-a: #ff7a41;
+  --brand-b: #f95bf6;
+  --brand-c: #745bff;
+  --surface: #ffffff;
+  --surface-2: #f7f6ff;
+  --surface-3: #edeaff;
+  --text-primary: #1a1730;
+  --text-secondary: #6b6587;
+  --text-muted: #a49ec5;
+  --border: #e5e1f5;
+  --user-bubble: #745bff;
+  --user-text: #ffffff;
+  --bot-bubble: #f0eeff;
+  --bot-text: #1a1730;
+  --warn-bg: #fff8ec;
+  --warn-border: #f5c842;
+  --warn-text: #7a5800;
+  --success: #2e9e48;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --shadow: 0 8px 40px rgba(116,91,255,0.13);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, #fff5f2 0%, #fdf0ff 50%, #f0edff 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* ── Header bar ── */
+.page-header {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.logo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--brand-a), var(--brand-b), var(--brand-c));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.3px;
+}
+
+.step-pills {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.step-pill {
+  width: 28px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--border);
+  transition: background 0.4s;
+}
+
+.step-pill.active {
+  background: linear-gradient(90deg, var(--brand-b), var(--brand-c));
+}
+
+/* ── Chat card ── */
+.chat-card {
+  width: 100%;
+  max-width: 720px;
+  background: var(--surface);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 78vh;
+  min-height: 520px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* ── Chat header ── */
+.chat-header {
+  padding: 18px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-b), var(--brand-c));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar svg { display: block; }
+
+.chat-header-info { flex: 1; }
+
+.chat-header-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+
+.chat-header-status {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: #2e9e48;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Progress tracker */
+.progress-tracker {
+  display: flex;
+  gap: 0;
+  align-items: center;
+}
+
+.prog-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.prog-item.done { color: var(--brand-c); }
+
+.prog-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  transition: all 0.3s;
+}
+
+.prog-item.done .prog-dot {
+  background: var(--brand-c);
+  border-color: var(--brand-c);
+  color: white;
+}
+
+.prog-item.active .prog-dot {
+  border-color: var(--brand-b);
+  color: var(--brand-b);
+  background: #fdf0ff;
+}
+
+.prog-line {
+  width: 30px;
+  height: 1.5px;
+  background: var(--border);
+  margin: 0 2px;
+  margin-bottom: 16px;
+  transition: background 0.3s;
+}
+
+.prog-line.done { background: var(--brand-c); }
+
+/* ── Messages area ── */
+.chat-window {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scroll-behavior: smooth;
+}
+
+.chat-window::-webkit-scrollbar { width: 4px; }
+.chat-window::-webkit-scrollbar-track { background: transparent; }
+.chat-window::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* Message groups */
+.msg-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.msg-group.bot { align-items: flex-start; }
+.msg-group.user { align-items: flex-end; }
+
+.msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.msg-group.user .msg-row { flex-direction: row-reverse; }
+
+.bot-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-b), var(--brand-c));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.bot-icon-spacer {
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.bubble {
+  max-width: 72%;
+  padding: 10px 14px;
+  line-height: 1.5;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.bubble.bot {
+  background: var(--bot-bubble);
+  color: var(--bot-text);
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px;
+}
+
+.bubble.user {
+  background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+  color: var(--user-text);
+  border-radius: var(--radius-lg) var(--radius-lg) 4px var(--radius-lg);
+}
+
+.bubble.warning {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 80%;
+}
+
+.timestamp {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 0 4px;
+  margin-top: 2px;
+}
+
+/* ── Typing indicator ── */
+.typing-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 8px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.typing-row.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.typing-bubble {
+  background: var(--bot-bubble);
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px;
+  padding: 12px 16px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* ── Chip suggestions ── */
+.chips-area {
+  padding: 4px 20px 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 0;
+  transition: min-height 0.2s;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brand-c);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  background: var(--brand-c);
+  color: white;
+  border-color: var(--brand-c);
+  transform: translateY(-1px);
+}
+
+/* ── Summary card ── */
+.summary-card {
+  margin: 0 20px 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  display: none;
+}
+
+.summary-card.visible { display: block; }
+
+.summary-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.summary-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.summary-field {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.field-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.field-value {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ── Input area ── */
+.input-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.icon-btn:hover {
+  background: var(--surface-3);
+  border-color: var(--brand-c);
+  color: var(--brand-c);
+}
+
+#userInput {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 99px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#userInput::placeholder { color: var(--text-muted); }
+
+#userInput:focus {
+  border-color: var(--brand-c);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(116, 91, 255, 0.08);
+}
+
+#sendBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 10px rgba(116,91,255,0.3);
+}
+
+#sendBtn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 4px 16px rgba(116,91,255,0.4);
+}
+
+#sendBtn:active { transform: scale(0.96); }
+
+#sendBtn svg { display: block; }
+
+#submitBtn {
+  display: none;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 99px;
+  background: linear-gradient(135deg, var(--brand-a), var(--brand-b));
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  box-shadow: 0 2px 10px rgba(249,91,246,0.3);
+  flex-shrink: 0;
+}
+
+#submitBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(249,91,246,0.4);
+}
+
+/* ── Confidence badge ── */
+.conf-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 99px;
+  margin-top: 5px;
+}
+
+.conf-badge.high {
+  background: #e6f9ed;
+  color: #1a7035;
+}
+
+.conf-badge.medium {
+  background: var(--warn-bg);
+  color: #7a5800;
+}
+
+.conf-badge.low {
+  background: #fef0f0;
+  color: #9b1c1c;
+}
+
+/* ── Slide-in animation ── */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.msg-group { animation: slideIn 0.2s ease forwards; }
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  body { padding: 0; }
+  .chat-card {
+    border-radius: 0;
+    height: 100vh;
+    min-height: unset;
+    border: none;
+  }
+  .page-header { display: none; }
+  .progress-tracker { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Page header -->
+<div class="page-header">
+  <div class="logo">CivAura</div>
+  <div class="progress-tracker" id="progressTracker">
+    <div class="prog-item active" id="prog-0"><div class="prog-dot" id="pd-0">1</div><span>Issue</span></div>
+    <div class="prog-line" id="pl-0"></div>
+    <div class="prog-item" id="prog-1"><div class="prog-dot" id="pd-1">2</div><span>Location</span></div>
+    <div class="prog-line" id="pl-1"></div>
+    <div class="prog-item" id="prog-2"><div class="prog-dot" id="pd-2">3</div><span>Duration</span></div>
+    <div class="prog-line" id="pl-2"></div>
+    <div class="prog-item" id="prog-3"><div class="prog-dot" id="pd-3">4</div><span>Review</span></div>
+  </div>
+</div>
+
+<!-- Chat card -->
+<div class="chat-card">
+
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="avatar">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="7" r="3.5" fill="white" fill-opacity="0.9"/>
+        <path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">CivAura Assistant</div>
+      <div class="chat-header-status">
+        <span class="status-dot"></span>
+        Online — grievance filing
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div id="chatWindow" class="chat-window"></div>
+
+  <!-- Typing indicator -->
+  <div class="typing-row" id="typingRow">
+    <div class="bot-icon">
+      <svg width="13" height="13" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="7" r="3.5" fill="white" fill-opacity="0.9"/>
+        <path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="typing-bubble">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  </div>
+
+  <!-- Chip suggestions -->
+  <div class="chips-area" id="chipsArea"></div>
+
+  <!-- Collected fields summary -->
+  <div class="summary-card" id="summaryCard">
+    <div class="summary-title">Collected so far</div>
+    <div class="summary-fields" id="summaryFields"></div>
+  </div>
+
+  <!-- Input area -->
+  <div class="input-area">
+    <button class="icon-btn" id="attachBtn" title="Attach file">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+      </svg>
+    </button>
+    <input type="file" id="fileInput" style="display:none">
+
+    <input id="userInput" placeholder="Describe your grievance…" autocomplete="off">
+
+    <button id="sendBtn" aria-label="Send">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+
+    <button id="submitBtn">Submit complaint</button>
+  </div>
+
+</div>
+
+<script>
+
+/* ─── Auth guard ─── */
+// if(!sessionStorage.getItem("token")){ window.location="/auth.html" }
+
+/* ─── State ─── */
+let step = 0;
+
+let complaintData = {
+  description: "",
+  district: "",
+  pincode: "",
+  duration: "",
+  category_code: "",
+  org_code: "",
+  confidence: "",
+  attachment_path: ""
+};
+
+/* ─── DOM refs ─── */
+const chatWindow  = document.getElementById("chatWindow");
+const userInput   = document.getElementById("userInput");
+const typingRow   = document.getElementById("typingRow");
+const chipsArea   = document.getElementById("chipsArea");
+const summaryCard = document.getElementById("summaryCard");
+const summaryFields = document.getElementById("summaryFields");
+
+/* ─── Helpers ─── */
+function getTime(){
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function scrollBottom(){
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+function showTyping(){
+  typingRow.classList.add("visible");
+  scrollBottom();
+}
+
+function hideTyping(){
+  typingRow.classList.remove("visible");
+}
+
+function setProgress(step){
+  for(let i = 0; i < 4; i++){
+    const prog = document.getElementById(`prog-${i}`);
+    const dot  = document.getElementById(`pd-${i}`);
+    if(i < step){
+      prog.className = "prog-item done";
+      dot.innerHTML = `<svg width="9" height="9" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      if(i < 3) document.getElementById(`pl-${i}`).className = "prog-line done";
+    } else if(i === step){
+      prog.className = "prog-item active";
+    } else {
+      prog.className = "prog-item";
+      dot.textContent = i + 1;
+    }
+  }
+}
+
+function updateSummary(){
+  const fields = [
+    { label: "Issue", value: complaintData.description, key: "description" },
+    { label: "District", value: complaintData.district, key: "district" },
+    { label: "Pincode", value: complaintData.pincode, key: "pincode" },
+    { label: "Duration", value: complaintData.duration, key: "duration" },
+  ];
+
+  const filled = fields.filter(f => f.value);
+  if(!filled.length){ summaryCard.classList.remove("visible"); return; }
+
+  summaryCard.classList.add("visible");
+  summaryFields.innerHTML = filled.map(f => `
+    <div class="summary-field">
+      <span class="field-label">${f.label}</span>
+      <span class="field-value">${f.value}</span>
+    </div>
+  `).join("");
+}
+
+/* ─── Add message ─── */
+function addMessage(html, type, showAvatar = true){
+  const group = document.createElement("div");
+  group.className = `msg-group ${type === "user" ? "user" : "bot"}`;
+
+  const row = document.createElement("div");
+  row.className = "msg-row";
+
+  if(type !== "user" && type !== "warning"){
+    const icon = document.createElement("div");
+    if(showAvatar){
+      icon.className = "bot-icon";
+      icon.innerHTML = `<svg width="13" height="13" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.5" fill="white" fill-opacity="0.9"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.9"/></svg>`;
+    } else {
+      icon.className = "bot-icon-spacer";
+    }
+    row.appendChild(icon);
+  }
+
+  const bubble = document.createElement("div");
+  bubble.className = `bubble ${type === "user" ? "user" : type === "warning" ? "warning" : "bot"}`;
+  bubble.innerHTML = html;
+
+  row.appendChild(bubble);
+  group.appendChild(row);
+
+  const ts = document.createElement("div");
+  ts.className = "timestamp";
+  ts.style.paddingLeft = (type !== "user" && type !== "warning") ? "36px" : "0";
+  ts.textContent = getTime();
+  group.appendChild(ts);
+
+  chatWindow.appendChild(group);
+  scrollBottom();
+}
+
+/* ─── Render chips ─── */
+function renderChips(items, onSelect){
+  chipsArea.innerHTML = "";
+  items.forEach(item => {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.textContent = typeof item === "string" ? item : item.description || item;
+    chip.onclick = () => onSelect ? onSelect(chip.textContent) : null;
+    chipsArea.appendChild(chip);
+  });
+}
+
+/* ─── Debounce ─── */
+function debounce(fn, ms){
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+/* ─── Confidence badge helper ─── */
+function confBadge(score){
+  const pct = Math.round(score * 100);
+  const cls = pct >= 85 ? "high" : pct >= 65 ? "medium" : "low";
+  const label = pct >= 85 ? "Auto-routed" : pct >= 65 ? "Manual review" : "Low confidence";
+  return `<div class="conf-badge ${cls}">${label} · ${pct}%</div>`;
+}
+
+/* ─── API helpers (swap apiFetch / authHeaders with your real implementations) ─── */
+function authHeaders(){
+  const token = sessionStorage.getItem("token");
+  return token ? { "Authorization": `Bearer ${token}` } : {};
+}
+
+async function apiFetch(path, opts = {}){
+  return fetch(path, opts);
+}
+
+/* ─── Init ─── */
+window.onload = () => {
+  setProgress(0);
+  addMessage("Hello! I'm here to help you file a grievance with the right department.", "bot", true);
+  setTimeout(() => {
+    addMessage("What is the problem you'd like to report?", "bot", false);
+    userInput.focus();
+  }, 700);
+};
+
+/* ─── Send button ─── */
+document.getElementById("sendBtn").onclick = sendMessage;
+userInput.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
+
+async function sendMessage(){
+  const text = userInput.value.trim();
+  if(!text) return;
+
+  addMessage(text, "user");
+  userInput.value = "";
+  renderChips([]);
+
+  try {
+
+    if(step === 0){
+      complaintData.description = text;
+      step = 1;
+      setProgress(1);
+      updateSummary();
+      showTyping();
+      setTimeout(() => {
+        hideTyping();
+        addMessage("Got it. Which <b>district</b> are you in, and what's your <b>pincode</b>?<br><small style='color:var(--text-muted)'>e.g. Hyderabad 500032</small>", "bot", true);
+      }, 700);
+
+    } else if(step === 1){
+      const parts = text.split(/\s+/);
+      complaintData.district = parts[0] || text;
+      complaintData.pincode  = parts[1] || "";
+      step = 2;
+      setProgress(2);
+      updateSummary();
+      showTyping();
+      setTimeout(() => {
+        hideTyping();
+        addMessage("How long has this been happening?<br><small style='color:var(--text-muted)'>e.g. 2 weeks, since last month</small>", "bot", true);
+      }, 700);
+
+    } else if(step === 2){
+      complaintData.duration = text;
+      step = 3;
+      setProgress(3);
+      updateSummary();
+      showTyping();
+
+      try {
+        const res = await apiFetch("/api/classify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...authHeaders() },
+          body: JSON.stringify({ complaint_text: complaintData.description })
+        });
+        const data = await res.json();
+        hideTyping();
+
+        complaintData.category_code    = data.category_code;
+        complaintData.category_name    = data.category_name  || "";
+        complaintData.org_code         = data.department     || "";
+        complaintData.priority         = data.priority       || "Medium";
+        complaintData.confidence       = data.confidence;
+
+        addMessage(
+          `I've categorised this as <b>${data.category_name || "General"}</b>, routed to <b>${data.department || "General Dept"}</b>.${confBadge(data.confidence || 0.5)}`,
+          "bot", true
+        );
+        const predRes = await apiFetch("/api/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", ...authHeaders() },
+            body: JSON.stringify({
+                category_code: data.category_code,
+                org_code: data.department || ""
+            })
+        })
+        const pred = await predRes.json()
+        complaintData.resolution_range = pred.range;
+        addMessage(
+            `Expected resolution in <b>${pred.estimated_days} days</b> &nbsp;·&nbsp; ${pred.range} &nbsp;·&nbsp; ${pred.confidence_band}`,
+            "bot"
+        )
+        if((data.confidence || 0) < 0.85){
+          addMessage(
+            `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            This complaint will be sent for <b>manual review</b> before final routing.`,
+            "warning"
+          );
+        }
+
+        setProgress(4);
+        document.getElementById("submitBtn").style.display = "inline-flex";
+
+      } catch(e){
+        hideTyping();
+        addMessage("I've collected all your details. Please submit when ready.", "bot", true);
+        document.getElementById("submitBtn").style.display = "inline-flex";
+      }
+    }
+
+  } catch(e){
+    hideTyping();
+    addMessage("Sorry, something went wrong. Please try again.", "bot", true);
+  }
+}
+
+/* ─── Autocomplete chips ─── */
+userInput.addEventListener("input", debounce(async () => {
+  const q = userInput.value.trim();
+  if(!q || step !== 0){ renderChips([]); return; }
+
+  try {
+    const res = await apiFetch(`/api/autocomplete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: JSON.stringify({ query: q })
+    });
+    const data = await res.json();
+    const suggestions = (data.suggestions || []).slice(0, 3);
+
+    renderChips(suggestions, (text) => {
+      userInput.value = text;
+      sendMessage();
+    });
+  } catch(e){ renderChips([]); }
+}, 350));
+
+/* ─── Attach file ─── */
+document.getElementById("attachBtn").onclick = () => document.getElementById("fileInput").click();
+
+document.getElementById("fileInput").onchange = async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const res = await apiFetch("/api/files/upload", {
+      method: "POST",
+      headers: authHeaders(),
+      body: formData
+    });
+    const data = await res.json();
+    complaintData.attachment_path = data.path;
+    addMessage(`Attachment added: <b>${file.name}</b>`, "bot", true);
+  } catch(e){
+    addMessage("Could not upload attachment. Please try again.", "bot", true);
+  }
+};
+
+/* ─── Submit ─── */
+document.getElementById("submitBtn").onclick = async () => {
+  try {
+    const res = await apiFetch("/api/chat/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: JSON.stringify({ collected_data: complaintData })
+    });
+    const data = await res.json();
+    sessionStorage.setItem("registration_no",  data.registration_no);
+    sessionStorage.setItem("category_name",    complaintData.category_name  || "");
+    sessionStorage.setItem("department",       complaintData.org_code        || "");
+    sessionStorage.setItem("priority",         complaintData.priority        || "Medium");
+    sessionStorage.setItem("confidence",       complaintData.confidence      || "0.5");
+    sessionStorage.setItem("needs_review",     String((complaintData.confidence || 0.5) < 0.85));
+    sessionStorage.setItem("resolution_range", complaintData.resolution_range || "7-9 days");
+    window.location = "/result";
+  } catch(e){
+    addMessage("Submission failed. Please try again.", "bot", true);
+  }
+};
+
+</script>
+</body>
+</html>

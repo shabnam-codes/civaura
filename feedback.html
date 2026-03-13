@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback — CivAura</title>
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand-a: #ff7a41;
+  --brand-b: #f95bf6;
+  --brand-c: #745bff;
+  --surface: #ffffff;
+  --surface-2: #f7f6ff;
+  --border: #e5e1f5;
+  --text-primary: #1a1730;
+  --text-secondary: #6b6587;
+  --text-muted: #a49ec5;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, #fff5f2 0%, #fdf0ff 50%, #f0edff 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 40px rgba(116,91,255,0.13);
+  width: 100%;
+  max-width: 480px;
+  padding: 36px 32px;
+}
+
+.logo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--brand-a), var(--brand-b), var(--brand-c));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 28px;
+}
+
+.reg-pill {
+  display: inline-block;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-c);
+  margin-bottom: 20px;
+  font-family: monospace;
+}
+
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+/* Star rating */
+.stars {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.star {
+  font-size: 32px;
+  cursor: pointer;
+  color: var(--border);
+  transition: color 0.15s, transform 0.15s;
+  user-select: none;
+  line-height: 1;
+}
+
+.star:hover,
+.star.active {
+  color: #f5a623;
+  transform: scale(1.15);
+}
+
+.star-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Textarea */
+.field-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  resize: none;
+  height: 100px;
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 20px;
+}
+
+textarea:focus {
+  border-color: var(--brand-c);
+  background: var(--surface);
+}
+
+textarea::placeholder { color: var(--text-muted); }
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 99px;
+  background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 12px rgba(116,91,255,0.3);
+}
+
+.submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(116,91,255,0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Result states */
+.result {
+  display: none;
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.result.positive {
+  background: #e6f9ed;
+  color: #1a7035;
+  border: 1px solid #9fe1cb;
+}
+
+.result.negative {
+  background: #fff8ec;
+  color: #7a5800;
+  border: 1px solid #f5c842;
+}
+
+.result.neutral {
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.result-icon {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.escalation-note {
+  display: none;
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: #fff8ec;
+  border: 1px solid #f5c842;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #7a5800;
+  text-align: center;
+}
+
+/* Thank you screen */
+.thankyou {
+  display: none;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.thankyou-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.thankyou h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.thankyou p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.fb-id {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: monospace;
+  margin-top: 8px;
+}
+
+.home-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 99px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--brand-c);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.home-btn:hover {
+  background: var(--surface-3, #edeaff);
+  border-color: var(--brand-c);
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">CivAura</div>
+
+  <!-- Main form -->
+  <div id="formSection">
+    <div class="reg-pill" id="regPill">Loading...</div>
+    <h1>Rate your experience</h1>
+    <p class="subtitle">How was the resolution of your complaint?</p>
+
+    <div class="star-label">Your rating</div>
+    <div class="stars" id="stars">
+      <span class="star" data-val="1">&#9733;</span>
+      <span class="star" data-val="2">&#9733;</span>
+      <span class="star" data-val="3">&#9733;</span>
+      <span class="star" data-val="4">&#9733;</span>
+      <span class="star" data-val="5">&#9733;</span>
+    </div>
+
+    <div class="field-label">Comments (optional)</div>
+    <textarea id="commentText" placeholder="Tell us about your experience..."></textarea>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitFeedback()">Submit feedback</button>
+
+    <div class="result" id="resultBox">
+      <span class="result-icon" id="resultIcon"></span>
+      <span id="resultText"></span>
+    </div>
+
+    <div class="escalation-note" id="escalationNote">
+      Your feedback has been escalated to a supervisor for review.
+    </div>
+  </div>
+
+  <!-- Thank you screen -->
+  <div class="thankyou" id="thankyouSection">
+    <div class="thankyou-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h2>Thank you!</h2>
+    <p>Your feedback helps us improve civic services for everyone.</p>
+    <a href="/" class="home-btn">Back to home</a>
+    <div class="fb-id" id="fbId"></div>
+  </div>
+</div>
+
+<script>
+let selectedRating = 0;
+
+// ── Get reg number from URL or sessionStorage ──
+const params = new URLSearchParams(window.location.search);
+const regNo  = params.get('reg') || sessionStorage.getItem('registration_no') || 'GRIEV/XX/0000000';
+document.getElementById('regPill').textContent = regNo;
+
+// ── Star interaction ──
+const stars = document.querySelectorAll('.star');
+
+stars.forEach(star => {
+  star.addEventListener('mouseover', () => highlightStars(+star.dataset.val));
+  star.addEventListener('mouseout',  () => highlightStars(selectedRating));
+  star.addEventListener('click',     () => {
+    selectedRating = +star.dataset.val;
+    highlightStars(selectedRating);
+  });
+});
+
+function highlightStars(n) {
+  stars.forEach(s => s.classList.toggle('active', +s.dataset.val <= n));
+}
+
+// ── Submit ──
+async function submitFeedback() {
+  if(!selectedRating){
+    alert('Please select a star rating.');
+    return;
+  }
+
+  const btn  = document.getElementById('submitBtn');
+  const text = document.getElementById('commentText').value.trim();
+
+  btn.disabled    = true;
+  btn.textContent = 'Submitting...';
+
+  try {
+    const res = await fetch('/api/feedback/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        registration_no: regNo,
+        rating:          selectedRating,
+        text:            text
+      })
+    });
+
+    const data = await res.json();
+
+    // Show sentiment result
+    const resultBox  = document.getElementById('resultBox');
+    const resultIcon = document.getElementById('resultIcon');
+    const resultText = document.getElementById('resultText');
+
+    const sentimentMap = {
+      Positive: { cls: 'positive', icon: '&#9786;', msg: 'Glad to hear your experience was positive!' },
+      Neutral:  { cls: 'neutral',  icon: '&#9675;', msg: 'Thank you for your feedback.' },
+      Negative: { cls: 'negative', icon: '&#9888;', msg: 'We\'re sorry to hear that. We\'ll work to improve.' }
+    };
+
+    const s = sentimentMap[data.sentiment] || sentimentMap['Neutral'];
+    resultBox.className   = `result ${s.cls}`;
+    resultIcon.innerHTML  = s.icon;
+    resultText.textContent = s.msg;
+    resultBox.style.display = 'block';
+
+    if(data.flagged){
+      document.getElementById('escalationNote').style.display = 'block';
+    }
+
+    // Transition to thank you screen after 2 seconds
+    setTimeout(() => {
+      document.getElementById('formSection').style.display  = 'none';
+      document.getElementById('thankyouSection').style.display = 'block';
+      document.getElementById('fbId').textContent = `Feedback ID: ${data.feedback_id || ''}`;
+    }, 2000);
+
+  } catch(e) {
+    btn.disabled    = false;
+    btn.textContent = 'Submit feedback';
+    alert('Submission failed. Please try again.');
+  }
+}
+</script>
+</body>
+</html>

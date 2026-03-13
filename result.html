@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complaint Submitted — CivAura</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand-a: #ff7a41;
+  --brand-b: #f95bf6;
+  --brand-c: #745bff;
+  --surface: #ffffff;
+  --surface-2: #f7f6ff;
+  --surface-3: #edeaff;
+  --border: #e5e1f5;
+  --text-primary: #1a1730;
+  --text-secondary: #6b6587;
+  --text-muted: #a49ec5;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, #fff5f2 0%, #fdf0ff 50%, #f0edff 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 40px rgba(116,91,255,0.13);
+  width: 100%;
+  max-width: 560px;
+  padding: 36px 32px;
+}
+
+.logo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--brand-a), var(--brand-b), var(--brand-c));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 24px;
+}
+
+.success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.page-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  letter-spacing: -0.3px;
+}
+
+.reg-box {
+  background: var(--surface-2);
+  border: 1.5px dashed var(--brand-c);
+  border-radius: 14px;
+  padding: 16px 20px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.reg-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.reg-number {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--brand-c);
+  letter-spacing: 2px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.info-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.info-card-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.info-card-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-green  { background: #e6f9ed; color: #1a7035; }
+.badge-red    { background: #fef0f0; color: #9b1c1c; }
+.badge-orange { background: #fff8ec; color: #7a5800; }
+.badge-yellow { background: #fffde6; color: #854d0e; }
+.badge-purple { background: var(--surface-3); color: var(--brand-c); }
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 20px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 13px;
+  border: none;
+  border-radius: 99px;
+  background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  box-shadow: 0 2px 12px rgba(116,91,255,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(116,91,255,0.4);
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: var(--surface-2);
+  color: var(--brand-c);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.btn-secondary:hover {
+  background: var(--surface-3);
+  border-color: var(--brand-c);
+}
+
+@media (max-width: 480px) {
+  body { padding: 0; align-items: flex-start; }
+  .card { border-radius: 0; min-height: 100vh; box-shadow: none; border: none; }
+  .info-grid { grid-template-columns: 1fr; }
+  .btn-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">CivAura</div>
+
+  <div class="success-icon">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+
+  <div class="page-label">Complaint registered</div>
+  <h1>Submission successful</h1>
+
+  <div class="reg-box">
+    <div class="reg-label">Your registration number</div>
+    <div class="reg-number" id="regNo">GRIEV/XX/0000000</div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-label">Category</div>
+      <div class="info-card-value" id="resCategory">—</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">Department</div>
+      <div class="info-card-value" id="resDept">—</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">Priority</div>
+      <div class="info-card-value" id="resPriority">—</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">Confidence</div>
+      <div class="info-card-value" id="resConfidence">—</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">Routing</div>
+      <div class="info-card-value" id="resRouting">—</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">Expected resolution</div>
+      <div class="info-card-value" id="resDays">—</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="btn-row">
+    <a href="/track-status" class="btn-primary">Track complaint</a>
+    <a href="/feedback" class="btn-secondary">Leave feedback</a>
+  </div>
+</div>
+
+<script>
+const regNo      = sessionStorage.getItem("registration_no") || "GRIEV/XX/0000000"
+const category   = sessionStorage.getItem("category_name")   || "—"
+const dept       = sessionStorage.getItem("department")       || "—"
+const priority   = sessionStorage.getItem("priority")         || "Medium"
+const confidence = sessionStorage.getItem("confidence")       || "0"
+const needReview = sessionStorage.getItem("needs_review")     || "false"
+const days       = sessionStorage.getItem("resolution_range") || "—"
+
+document.getElementById("regNo").textContent       = regNo
+document.getElementById("resCategory").textContent = category
+document.getElementById("resDept").textContent     = dept
+document.getElementById("resDays").textContent     = days
+
+const priorityColors = {
+  Critical: "badge-red",
+  High:     "badge-orange",
+  Medium:   "badge-yellow",
+  Low:      "badge-green"
+}
+document.getElementById("resPriority").innerHTML =
+  `<span class="badge ${priorityColors[priority] || "badge-yellow"}">${priority}</span>`
+
+document.getElementById("resConfidence").textContent =
+  confidence ? (parseFloat(confidence) * 100).toFixed(0) + "%" : "—"
+
+document.getElementById("resRouting").innerHTML = needReview === "true"
+  ? '<span class="badge badge-orange">Under review</span>'
+  : '<span class="badge badge-purple">Auto-routed</span>'
+
+// Pass reg number to feedback page
+document.querySelector('a[href="/feedback"]').href =
+  `/feedback?reg=${encodeURIComponent(regNo)}`
+</script>
+
+</body>
+</html>

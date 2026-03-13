@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Complaint — CivAura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand-a: #ff7a41;
+      --brand-b: #f95bf6;
+      --brand-c: #745bff;
+      --surface: #ffffff;
+      --surface-2: #f7f6ff;
+      --surface-3: #edeaff;
+      --border: #e5e1f5;
+      --text-primary: #1a1730;
+      --text-secondary: #6b6587;
+      --text-muted: #a49ec5;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(135deg, #fff5f2 0%, #fdf0ff 50%, #f0edff 100%);
+      min-height: 100vh;
+      padding-top: 64px;
+    }
+
+    /* HEADER */
+    .main-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .main-logo {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--brand-a), var(--brand-b), var(--brand-c));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+
+    .main-menu {
+      list-style: none;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .main-menu a {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text-secondary);
+      transition: color 0.15s;
+    }
+
+    .main-menu a:hover { color: var(--brand-c); }
+    .main-menu .cta-link a {
+      background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* PAGE */
+    .page-wrapper {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 48px 20px 60px;
+    }
+
+    .page-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 32px;
+      letter-spacing: -0.3px;
+    }
+
+    /* SEARCH */
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .search-row input {
+      flex: 1;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text-primary);
+      background: white;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-row input:focus { border-color: var(--brand-c); }
+    .search-row input::placeholder { color: var(--text-muted); }
+
+    .search-row button {
+      padding: 13px 22px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 2px 12px rgba(116,91,255,0.3);
+      white-space: nowrap;
+    }
+
+    .search-row button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(116,91,255,0.4);
+    }
+
+    /* ERROR */
+    .error-msg {
+      background: #fef0f0;
+      border: 1px solid #fcd5d5;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #9b1c1c;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    /* STATUS CARD */
+    .status-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 8px 40px rgba(116,91,255,0.1);
+      overflow: hidden;
+      display: none;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      padding: 24px 28px;
+      background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+      color: white;
+    }
+
+    .card-header-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      opacity: 0.75;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .card-reg {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+
+    .card-body {
+      padding: 24px 28px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .info-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .info-card-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .info-card-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-green  { background: #e6f9ed; color: #1a7035; }
+    .badge-red    { background: #fef0f0; color: #9b1c1c; }
+    .badge-orange { background: #fff8ec; color: #7a5800; }
+    .badge-yellow { background: #fffde6; color: #854d0e; }
+    .badge-purple { background: var(--surface-3); color: var(--brand-c); }
+    .badge-blue   { background: #eff6ff; color: #1d4ed8; }
+
+    /* TIMELINE */
+    .timeline-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 24px;
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding-bottom: 18px;
+      position: relative;
+    }
+
+    .timeline-item:last-child { padding-bottom: 0; }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 24px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item:last-child::before { display: none; }
+
+    .timeline-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      z-index: 1;
+    }
+
+    .dot-done {
+      background: #e6f9ed;
+      color: #1a7035;
+      border: 2px solid #1a7035;
+    }
+
+    .dot-active {
+      background: var(--surface-3);
+      color: var(--brand-c);
+      border: 2px solid var(--brand-c);
+    }
+
+    .dot-pending {
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 2px solid var(--border);
+    }
+
+    .timeline-text {
+      padding-top: 3px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .timeline-text.muted { color: var(--text-muted); }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 20px;
+    }
+
+    /* BUTTONS */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 13px;
+      border: none;
+      border-radius: 99px;
+      background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      box-shadow: 0 2px 12px rgba(116,91,255,0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(116,91,255,0.4);
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      background: var(--surface-2);
+      color: var(--brand-c);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .btn-secondary:hover { background: var(--surface-3); border-color: var(--brand-c); }
+
+    /* LOADING */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 32px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--brand-c);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 480px) {
+      .info-grid { grid-template-columns: 1fr; }
+      .btn-row { flex-direction: column; }
+      .main-header { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="main-header">
+    <div class="header-wrapper">
+      <a href="/" class="main-logo">CIVAURA</a>
+      <nav>
+        <ul class="main-menu">
+          <li><a href="/">Home</a></li>
+          <li><a href="/chat">File Complaint</a></li>
+          <li><a href="/feedback">Feedback</a></li>
+          <li class="cta-link"><a href="/chat">New Complaint</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="page-wrapper">
+    <div class="page-label">Grievance Portal</div>
+    <h1>Track your complaint</h1>
+
+    <div class="search-row">
+      <input id="regno" placeholder="Enter registration number (e.g. GRIEV/DL/0001234)" />
+      <button onclick="track()">Track →</button>
+    </div>
+
+    <div class="error-msg" id="errorMsg">Registration number not found. Please check and try again.</div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      Looking up your complaint…
+    </div>
+
+    <div class="status-card" id="statusCard">
+
+      <div class="card-header">
+        <div class="card-header-label">Registration Number</div>
+        <div class="card-reg" id="reg">—</div>
+      </div>
+
+      <div class="card-body">
+
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="info-card-label">Category</div>
+            <div class="info-card-value" id="category">—</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Department</div>
+            <div class="info-card-value" id="dept">—</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Priority</div>
+            <div class="info-card-value" id="priority">—</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Status</div>
+            <div class="info-card-value" id="status">—</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Date Submitted</div>
+            <div class="info-card-value" id="date">—</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">Expected Resolution</div>
+            <div class="info-card-value" id="days">—</div>
+          </div>
+        </div>
+
+        <div class="timeline-title">Progress</div>
+        <div class="timeline" id="timeline"></div>
+
+        <div class="divider"></div>
+
+        <div class="btn-row">
+          <a id="feedbackBtn" href="/feedback" class="btn-primary">Rate your experience</a>
+          <a href="/chat" class="btn-secondary">File another complaint</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STAGES = [
+      "Complaint Filed",
+      "Under Review",
+      "Assigned to Department",
+      "Resolution in Progress",
+      "Resolved"
+    ]
+
+    const priorityColors = {
+      Critical: "badge-red",
+      High:     "badge-orange",
+      Medium:   "badge-yellow",
+      Low:      "badge-green"
+    }
+
+    const statusColors = {
+      Resolved:   "badge-green",
+      Pending:    "badge-yellow",
+      "In Progress": "badge-blue",
+      Escalated:  "badge-red"
+    }
+
+    function buildTimeline(currentStatus) {
+      const resolvedIdx = currentStatus === "Resolved" ? 4
+        : currentStatus === "In Progress" ? 3
+        : currentStatus === "Assigned" ? 2
+        : currentStatus === "Under Review" ? 1 : 0
+
+      return STAGES.map((label, i) => {
+        const state = i < resolvedIdx ? "done" : i === resolvedIdx ? "active" : "pending"
+        const icon  = state === "done" ? "✓" : state === "active" ? "●" : "○"
+        return `
+          <div class="timeline-item">
+            <div class="timeline-dot dot-${state}">${icon}</div>
+            <div class="timeline-text ${state === 'pending' ? 'muted' : ''}">${label}</div>
+          </div>`
+      }).join('')
+    }
+
+    async function track() {
+      const reg = document.getElementById("regno").value.trim()
+      if (!reg) return
+
+      document.getElementById("errorMsg").style.display   = "none"
+      document.getElementById("statusCard").style.display = "none"
+      document.getElementById("loading").style.display    = "block"
+
+      try {
+        const routeRes = await fetch("/api/route", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ registration_no: reg })
+        })
+        const routeData = await routeRes.json()
+
+        if (routeData.error) throw new Error(routeData.error)
+
+        const predRes = await fetch("/api/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            category_code: routeData.category_code,
+            org_code:      routeData.org_code
+          })
+        })
+        const predData = await predRes.json()
+
+        document.getElementById("loading").style.display    = "none"
+        document.getElementById("statusCard").style.display = "block"
+
+        document.getElementById("reg").textContent      = reg
+        document.getElementById("category").textContent = routeData.category   || "—"
+        document.getElementById("dept").textContent     = routeData.assigned_to || "—"
+        document.getElementById("date").textContent     = routeData.date        || "—"
+        document.getElementById("days").textContent     = predData.range        || (predData.estimated_days + " days") || "—"
+
+        const p = routeData.priority || "Medium"
+        document.getElementById("priority").innerHTML =
+          `<span class="badge ${priorityColors[p] || 'badge-yellow'}">${p}</span>`
+
+        const s = routeData.status || "Pending"
+        document.getElementById("status").innerHTML =
+          `<span class="badge ${statusColors[s] || 'badge-yellow'}">${s}</span>`
+
+        document.getElementById("timeline").innerHTML = buildTimeline(s)
+
+        const feedbackBtn = document.getElementById("feedbackBtn")
+        if (s === "Resolved") {
+          sessionStorage.setItem("registration_no", reg)
+          feedbackBtn.href = `/feedback?reg=${encodeURIComponent(reg)}`
+          feedbackBtn.style.display = "flex"
+        } else {
+          feedbackBtn.style.display = "none"
+        }
+
+      } catch (e) {
+        document.getElementById("loading").style.display = "none"
+        document.getElementById("errorMsg").style.display = "block"
+      }
+    }
+
+    // Auto-track if reg number passed via URL param
+    const urlReg = new URLSearchParams(window.location.search).get("reg")
+    if (urlReg) {
+      document.getElementById("regno").value = urlReg
+      track()
+    }
+
+    document.getElementById("regno").addEventListener("keydown", e => {
+      if (e.key === "Enter") track()
+    })
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivAura — AI Grievance Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/static/script.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand-a: #ff7a41;
+      --brand-b: #f95bf6;
+      --brand-c: #745bff;
+      --text-primary: #1a1730;
+      --text-secondary: #6b6587;
+      --text-muted: #a49ec5;
+      --surface: #ffffff;
+      --surface-2: #f7f6ff;
+      --border: #e5e1f5;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary);
+      background: var(--surface);
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    .main-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000 !important;
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.95) !important;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .main-logo {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--brand-a), var(--brand-b), var(--brand-c));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+    }
+
+    .main-menu {
+      list-style: none;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .main-menu a {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--text-secondary);
+      transition: color 0.15s;
+    }
+
+    .main-menu a:hover { color: var(--brand-c); }
+
+    .main-menu .cta-link a {
+      background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── HERO ── */
+    #section-1 {
+      min-height: 100vh;
+      padding-top: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fff5f2 0%, #fdf0ff 50%, #f0edff 100%);
+    }
+
+    .hero-bg-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .blob-1 {
+      width: 500px; height: 500px;
+      background: var(--brand-a);
+      top: -100px; right: -100px;
+    }
+
+    .blob-2 {
+      width: 400px; height: 400px;
+      background: var(--brand-b);
+      bottom: -80px; left: -80px;
+    }
+
+    .blob-3 {
+      width: 300px; height: 300px;
+      background: var(--brand-c);
+      top: 40%; left: 40%;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 760px;
+      text-align: center;
+      padding: 40px 24px;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--brand-c);
+      background: rgba(116,91,255,0.1);
+      border: 1px solid rgba(116,91,255,0.2);
+      border-radius: 99px;
+      padding: 5px 14px;
+      margin-bottom: 24px;
+    }
+
+    .hero-inner h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(38px, 6vw, 72px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+    }
+
+    .hero-inner h1 span {
+      background: linear-gradient(90deg, var(--brand-a), var(--brand-b), var(--brand-c));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-inner p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 540px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-grad {
+      padding: 14px 28px;
+      border-radius: 99px;
+      background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s;
+      box-shadow: 0 4px 20px rgba(116,91,255,0.35);
+    }
+
+    .btn-grad:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(116,91,255,0.45); }
+
+    .btn-outline {
+      padding: 14px 28px;
+      border-radius: 99px;
+      border: 1.5px solid var(--border);
+      background: white;
+      color: var(--text-primary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .btn-outline:hover { border-color: var(--brand-c); color: var(--brand-c); }
+
+    .hero-steps {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-top: 56px;
+      flex-wrap: wrap;
+    }
+
+    .hero-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-left: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .hero-step:first-child { border-left: none; }
+
+    .step-num {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--brand-c);
+      opacity: 0.5;
+    }
+
+    .step-text {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+    }
+
+    /* ── SECTION SHARED ── */
+    .section-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 100px 24px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--brand-c);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 56px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    #section-2 { background: white; }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+    }
+
+    .step-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(116,91,255,0.12);
+    }
+
+    .step-icon {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .step-card h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .step-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ── FEATURES ── */
+    #section-3 {
+      background: linear-gradient(135deg, #fff5f2 0%, #fdf0ff 50%, #f0edff 100%);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(116,91,255,0.13);
+    }
+
+    .feature-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--brand-c);
+      background: rgba(116,91,255,0.08);
+      border-radius: 99px;
+      padding: 3px 10px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ── STATS ── */
+    #section-4 { background: white; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      margin-bottom: 60px;
+    }
+
+    .stat-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 40px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--brand-c), var(--brand-b));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* ── CTA ── */
+    #section-5 {
+      background: linear-gradient(135deg, var(--brand-c) 0%, var(--brand-b) 100%);
+    }
+
+    #section-5 .section-wrapper {
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    #section-5 .section-title { color: white; }
+    #section-5 .section-sub   { color: rgba(255,255,255,0.75); margin: 0 auto 36px; }
+
+    .btn-white {
+      padding: 14px 32px;
+      border-radius: 99px;
+      background: white;
+      color: var(--brand-c);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.15s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      display: inline-block;
+    }
+
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+
+    /* ── FOOTER ── */
+    #main-footer {
+      background: var(--text-primary);
+      color: rgba(255,255,255,0.6);
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--brand-a), var(--brand-b), var(--brand-c));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 3px;
+      margin-bottom: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      list-style: none;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover { color: white; }
+
+    .footer-copy {
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    @media (max-width: 640px) {
+      .main-header { padding: 0 20px; }
+      .main-menu { gap: 16px; }
+      .main-menu li:not(:last-child):not(:first-child) { display: none; }
+      .hero-step { padding: 8px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="main-header">
+    <div class="header-wrapper">
+      <div class="main-logo">CIVAURA</div>
+      <nav>
+        <ul class="main-menu">
+          <li><a href="/">Home</a></li>
+          <li><a href="/#section-2">How It Works</a></li>
+          <li><a href="/#section-3">Features</a></li>
+          <li><a href="/track-status">Track Status</a></li>
+          <li><a href="/feedback">Feedback</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="section-1">
+    <div class="hero-bg-blob blob-1"></div>
+    <div class="hero-bg-blob blob-2"></div>
+    <div class="hero-bg-blob blob-3"></div>
+    <div class="hero-inner">
+      <div class="hero-tag">AI-Powered Civic Grievance Portal</div>
+      <h1>Your voice,<br><span>heard and resolved</span></h1>
+      <p>CivAura uses AI to understand your complaint, route it to the right authority, and predict when it'll be resolved — in seconds.</p>
+      <div class="hero-btns">
+        <a href="/chat" class="btn-grad">File a Complaint</a>
+        <a href="/#section-2" class="btn-outline">How it works</a>
+      </div>
+      <div class="hero-steps">
+        <div class="hero-step">
+          <span class="step-num">01</span>
+          <span class="step-text">Report an issue</span>
+        </div>
+        <div class="hero-step">
+          <span class="step-num">02</span>
+          <span class="step-text">AI classifies it</span>
+        </div>
+        <div class="hero-step">
+          <span class="step-num">03</span>
+          <span class="step-text">Track resolution</span>
+        </div>
+        <div class="hero-step">
+          <span class="step-num">04</span>
+          <span class="step-text">Share feedback</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="section-2">
+    <div class="section-wrapper">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">From complaint to<br>resolution in 4 steps</h2>
+      <p class="section-sub">Our AI handles the heavy lifting — you just describe your problem in plain language.</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-icon">💬</div>
+          <h3>Describe Your Issue</h3>
+          <p>Chat with our AI assistant in plain language. No forms, no jargon — just tell us what happened.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">🧠</div>
+          <h3>AI Understands & Classifies</h3>
+          <p>Our model identifies the category, department, and priority of your complaint with high confidence.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">📍</div>
+          <h3>Auto-Routed to Authority</h3>
+          <p>Your complaint is automatically routed to the right department — no manual intervention needed.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">✅</div>
+          <h3>Track & Give Feedback</h3>
+          <p>Get a registration number instantly. Track progress and rate the resolution when it's done.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="section-3">
+    <div class="section-wrapper">
+      <div class="section-label">Capabilities</div>
+      <h2 class="section-title">Built with AI at<br>every step</h2>
+      <p class="section-sub">Five intelligent features working together to make civic grievance filing fast, fair, and frictionless.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-tag">Feature 1</div>
+          <h3>Confidence Thresholding</h3>
+          <p>Every classification comes with a confidence score. Low-confidence complaints are flagged for human review automatically.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-tag">Feature 2</div>
+          <h3>Smart Autocomplete</h3>
+          <p>As you type, FAISS-powered semantic search surfaces the most relevant complaint categories in real time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-tag">Feature 3</div>
+          <h3>Resolution Time Prediction</h3>
+          <p>A trained ML model predicts how long your complaint will take to resolve, based on category and department data.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-tag">Feature 4</div>
+          <h3>Sentiment-Aware Feedback</h3>
+          <p>Our feedback system analyses the sentiment of your response and flags unresolved or escalated complaints automatically.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-tag">Feature 5</div>
+          <h3>Conversational Filing Bot</h3>
+          <p>A guided chat interface collects your complaint details step by step — no complex forms, no confusion.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-tag">Data</div>
+          <h3>19,853 Categories</h3>
+          <p>Trained on real government grievance data covering 92 organisations and 10,302 routing rules across India.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section id="section-4">
+    <div class="section-wrapper">
+      <div class="section-label">By the numbers</div>
+      <h2 class="section-title">Built on real<br>government data</h2>
+      <p class="section-sub">CivAura isn't a demo — it's trained on actual civic grievance datasets.</p>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-num">19K+</div>
+          <div class="stat-label">Complaint categories</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">92</div>
+          <div class="stat-label">Government organisations</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">10K+</div>
+          <div class="stat-label">Routing rules</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">&lt;2s</div>
+          <div class="stat-label">Classification time</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="section-5">
+    <div class="section-wrapper">
+      <h2 class="section-title">Ready to file your complaint?</h2>
+      <p class="section-sub">It takes less than 2 minutes. Our AI does the rest.</p>
+      <a href="/chat" class="btn-white">Start Now →</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="main-footer">
+    <div class="footer-logo">CIVAURA</div>
+    <ul class="footer-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/chat">File Complaint</a></li>
+      <li><a href="/track-status">Track Status</a></li>
+      <li><a href="/feedback">Feedback</a></li>
+    </ul>
+    <p class="footer-copy">© 2026 CivAura · AI-Powered Civic Grievance Portal</p>
+  </footer>
+
+</body>
+</html>
