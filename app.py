@@ -8,27 +8,15 @@ import string
 import sys
 import pickle
 import numpy as np
-
-# ═══════════════════════════════════════════════
-# PATHS
-# ═══════════════════════════════════════════════
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR  = os.path.join(BASE_DIR, 'Data')
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-# ═══════════════════════════════════════════════
-# FLASK SETUP
-# ═══════════════════════════════════════════════
 app = Flask(__name__,
     template_folder=os.path.join(BASE_DIR, 'templates'),
     static_folder=os.path.join(BASE_DIR, 'static'),
     static_url_path='/static')
 CORS(app)
-
-# ═══════════════════════════════════════════════
-# GROQ SETUP
-# ═══════════════════════════════════════════════
 GROQ_KEY = os.environ.get("GROQ_API_KEY", "")
 client   = Groq(api_key=GROQ_KEY)
 
@@ -44,10 +32,6 @@ def ask_groq(prompt, max_tokens=200, temperature=0.1):
     except Exception as e:
         print(f"⚠️ Groq error: {e}")
         return ""
-
-# ═══════════════════════════════════════════════
-# LOAD DATA
-# ═══════════════════════════════════════════════
 print("⏳ Loading data_loader...")
 try:
     exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_loader.py')).read())
@@ -62,10 +46,6 @@ except Exception as e:
 
     def get_routing(category_code, org_code):
         return 'GENERAL_DEPT'
-
-# ═══════════════════════════════════════════════
-# PAGE ROUTES
-# ═══════════════════════════════════════════════
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -90,9 +70,8 @@ def feedback():
 def chat_page():
     return render_template('chat.html')
 
-# ═══════════════════════════════════════════════
 # FEATURE 5 — CONVERSATIONAL FILING BOT
-# ═══════════════════════════════════════════════
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     try:
@@ -148,10 +127,9 @@ assistant:"""
             "collected_data": {},
             "is_complete"   : False
         })
+        
+#CHAT SUBMIT
 
-# ═══════════════════════════════════════════════
-# FEATURE 5 — CHAT SUBMIT
-# ═══════════════════════════════════════════════
 @app.route('/api/chat/submit', methods=['POST'])
 def chat_submit():
     try:
@@ -168,10 +146,9 @@ def chat_submit():
     except Exception as e:
         print(f"⚠️ Submit error: {e}")
         return jsonify({"error": str(e)}), 500
+        
+# PREDICT RESOLVING TIMES
 
-# ═══════════════════════════════════════════════
-# FEATURE 3 — PREDICT RESOLVING TIMES
-# ═══════════════════════════════════════════════
 @app.route('/api/predict', methods=['POST'])
 def predict():
     try:
@@ -199,9 +176,8 @@ def predict():
             "confidence_band": "Medium certainty"
         }), 200
 
-# ═══════════════════════════════════════════════
 # ROUTING
-# ═══════════════════════════════════════════════
+
 @app.route('/api/route', methods=['POST'])
 def route():
     try:
@@ -221,9 +197,8 @@ def route():
             "avg_resolution" : "5–7 days"
         }), 200
 
-# ═══════════════════════════════════════════════
-# FEATURE 2 — SMART AUTOCOMPLETE
-# ═══════════════════════════════════════════════
+# SMART AUTOCOMPLETE
+
 @app.route('/api/autocomplete', methods=['POST'])
 def autocomplete():
     try:
@@ -256,9 +231,7 @@ def autocomplete():
         print(f"⚠️ Autocomplete error: {e}")
         return jsonify({"suggestions": [], "error": str(e)}), 500
 
-# ═══════════════════════════════════════════════
-# FEATURE 1 — CLASSIFY + CONFIDENCE THRESHOLDING
-# ═══════════════════════════════════════════════
+# CLASSIFY + CONFIDENCE THRESHOLDING
 @app.route('/api/classify', methods=['POST'])
 def classify():
     try:
@@ -320,9 +293,6 @@ Return ONLY the JSON object, nothing else:
             "error"        : str(e)
         }), 500
 
-# ═══════════════════════════════════════════════
-# FEATURE 4 — FEEDBACK SYSTEM
-# ═══════════════════════════════════════════════
 feedback_storage = []
 
 @app.route('/api/feedback/submit', methods=['POST'])
@@ -416,9 +386,7 @@ def feedback_summary():
             "error"              : str(e)
         }), 500
 
-# ═══════════════════════════════════════════════
 # RUN
-# ═══════════════════════════════════════════════
 if __name__ == '__main__':
     print("\n" + "=" * 50)
     print("✅ CivAura API Server Starting")
