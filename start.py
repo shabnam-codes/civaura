@@ -4,16 +4,10 @@ import os
 import sys
 
 sys.path.append('/content/backend')
-
-# ═══════════════════════════════════════════════
 # STEP 1 — SET NGROK TOKEN
-# ═══════════════════════════════════════════════
-NGROK_TOKEN = "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"  # ← get from ngrok.com → free signup
+NGROK_TOKEN = "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"  
 os.system(f"ngrok authtoken {NGROK_TOKEN}")
-
-# ═══════════════════════════════════════════════
 # STEP 2 — START FLASK IN BACKGROUND
-# ═══════════════════════════════════════════════
 def run_flask():
     os.chdir('/content/backend')
     exec(open('/content/backend/app.py').read(), {'__name__': '__main__'})
@@ -25,18 +19,11 @@ flask_thread.start()
 # Wait for Flask to boot
 time.sleep(5)
 print("✅ Flask running on port 5000")
-
-# ═══════════════════════════════════════════════
 # STEP 3 — START NGROK TUNNEL
-# ═══════════════════════════════════════════════
 from pyngrok import ngrok
-
 public_url = ngrok.connect(5000)
 url        = public_url.public_url
-
-# ═══════════════════════════════════════════════
 # STEP 4 — PRINT ALL URLS
-# ═══════════════════════════════════════════════
 print("\n" + "=" * 55)
 print("✅ ALL SYSTEMS RUNNING")
 print("=" * 55)
