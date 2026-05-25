@@ -4,18 +4,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import LabelEncoder
 import pickle
 import os
-
-# ═══════════════════════════════════════════════
-# PATHS — relative to this file's location
-# ═══════════════════════════════════════════════
 BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR   = os.path.join(BASE_DIR, 'Data')
 EXCEL_PATH = os.path.join(DATA_DIR, 'CategoryCode_Mapping.xlsx')
 MODEL_PATH = os.path.join(DATA_DIR, 'resolution_model.pkl')
-
-# ═══════════════════════════════════════════════
-# STEP 1 — LOAD EXCEL SHEETS
-# ═══════════════════════════════════════════════
 print("⏳ Loading Excel sheets...")
 categories_df   = pd.read_excel(EXCEL_PATH, sheet_name='Complaint Category')
 input_fields_df = pd.read_excel(EXCEL_PATH, sheet_name='Input Fields')
@@ -25,10 +17,6 @@ print(f"✅ Complaint Category : {len(categories_df)} rows")
 print(f"✅ Input Fields       : {len(input_fields_df)} rows")
 print(f"✅ Movement Mapping   : {len(movement_df)} rows")
 print(f"✅ Fixed Destination  : {len(fixed_dest_df)} rows")
-
-# ═══════════════════════════════════════════════
-# STEP 2 — CLEAN CATEGORIES
-# ═══════════════════════════════════════════════
 print("\n⏳ Cleaning category data...")
 categories_df = categories_df.dropna(subset=['Code', 'Description'])
 categories_df['Code'] = pd.to_numeric(categories_df['Code'], errors='coerce')
@@ -36,21 +24,12 @@ categories_df = categories_df.dropna(subset=['Code'])
 categories_df['Code'] = categories_df['Code'].astype(int)
 categories_df['Description'] = categories_df['Description'].str.strip()
 print(f"✅ Clean categories   : {len(categories_df)} rows")
-
-# ═══════════════════════════════════════════════
-# STEP 3 — BUILD USEFUL LISTS
-# ═══════════════════════════════════════════════
 print("\n⏳ Building lookup lists...")
 category_list = categories_df[['Code', 'Description']].values.tolist()
 org_list      = categories_df['OrgCode'].dropna().unique().tolist()
 cats_encoded  = categories_df['Code'].astype(str).tolist()
 print(f"✅ Category list      : {len(category_list)} entries")
 print(f"✅ Org codes          : {len(org_list)} unique")
-
-# ═══════════════════════════════════════════════
-# STEP 4 — BUILD ROUTING DICTIONARY
-# ═══════════════════════════════════════════════
-print("\n⏳ Building routing dictionary...")
 routing_dict = {}
 for _, row in movement_df.iterrows():
     try:
@@ -68,10 +47,6 @@ for _, row in fixed_dest_df.iterrows():
 
 print(f"✅ Routing rules      : {len(routing_dict)} entries")
 print(f"✅ Fixed destinations : {len(fixed_dest_dict)} entries")
-
-# ═══════════════════════════════════════════════
-# STEP 5 — RESOLUTION TIME MODEL
-# ═══════════════════════════════════════════════
 print("\n⏳ Setting up resolution time model...")
 le_cat = LabelEncoder()
 le_org = LabelEncoder()
@@ -105,10 +80,6 @@ else:
             'le_org' : le_org
         }, f)
     print("✅ Resolution model  : trained and saved")
-
-# ═══════════════════════════════════════════════
-# STEP 6 — HELPER FUNCTIONS
-# ═══════════════════════════════════════════════
 def get_resolution_days(category_code, org_code):
     try:
         cat_str = str(category_code)
@@ -153,10 +124,6 @@ def get_required_fields(category_code):
         return fields[['FieldName', 'DisplayLable', 'IsMandatory']].to_dict('records')
     except:
         return []
-
-# ═══════════════════════════════════════════════
-# SUMMARY
-# ═══════════════════════════════════════════════
 print("\n" + "=" * 45)
 print("✅ data_loader.py ready")
 print("=" * 45)
